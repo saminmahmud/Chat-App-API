@@ -1,0 +1,58 @@
+name: chat-app
+
+services:
+  web:
+    build: .
+    command: uv run python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    image: chat-app-image
+    container_name: chat-app-container
+    volumes:
+      - .:/app
+      - /app/.venv
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - chat-app-network
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16
+    container_name: chat-app-postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    volumes:
+      - postgres_chat_app_data:/var/lib/postgresql/data/
+    networks:
+      - chat-app-network
+
+  redis:
+    image: redis:alpine
+    container_name: chat-app-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    volumes:
+      - redis_chat_app_data:/data
+    networks:
+      - chat-app-network
+
+
+volumes:
+  postgres_chat_app_data:
+  redis_chat_app_data:
+
+networks:
+  chat-app-network:
+    driver: bridge
