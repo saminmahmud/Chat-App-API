@@ -39,6 +39,8 @@ jobs:
       DEBUG: "False"
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/chat_app
       REDIS_URL: redis://localhost:6379/0
+      EMAIL: test@example.com
+      EMAIL_PASSWORD: test-password
 
     steps:
       - name: Checkout Repository
