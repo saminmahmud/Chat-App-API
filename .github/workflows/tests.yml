@@ -1,0 +1,62 @@
+name: Django CI Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: chat_app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      SECRET_KEY: github-actions-secret-key
+      DEBUG: "False"
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/chat_app
+      REDIS_URL: redis://localhost:6379/0
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install Dependencies
+        run: uv sync --frozen
+
+      - name: Run Migrations
+        run: uv run manage.py migrate
+
+      - name: Run Tests
+        run: uv run manage.py test

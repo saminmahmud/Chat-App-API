@@ -112,26 +112,16 @@ DATABASES = {
 }
     
     
-if DEBUG:
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": ["redis://redis:6379/0"],
-                "prefix": "chat-app", 
-            },
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [config("REDIS_URL")],
+            "prefix": "chat-app", 
         },
-    }
-else:
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [config("REDIS_URL")],
-                "prefix": "chat-app", 
-            },
-        },
-    }
+    },
+}
 
 
 # Password validation

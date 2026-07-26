@@ -68,3 +68,11 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
     class Meta(UserDetailsSerializer.Meta):
         model = User
         fields = ("id", "username", "email", "is_active_user", "profile_picture", "bio", "last_seen", "created_at", "updated_at")
+        read_only_fields = ("email", "username", "is_active_user", "last_seen", "created_at", "updated_at")
+        
+    def validate(self, attrs):
+        if "username" in attrs:
+            raise serializers.ValidationError({"username": "You cannot update the username."})
+        if "email" in attrs:
+            raise serializers.ValidationError({"email": "You cannot update the email."})
+        return super().validate(attrs)
