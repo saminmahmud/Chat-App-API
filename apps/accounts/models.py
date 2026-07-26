@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from .managers import CustomUserManager
 
 
 class CustomUser(AbstractUser):
@@ -9,7 +10,9 @@ class CustomUser(AbstractUser):
     last_seen = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
+    objects = CustomUserManager()
+
     def save(self, *args, **kwargs):
         if not self.username:
             base_username = self.email.split("@")[0].lower()

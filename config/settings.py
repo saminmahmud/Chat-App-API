@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django_cleanup.apps.CleanupConfig',
     'rest_framework',
     'django_filters',
     'channels',
@@ -231,8 +232,9 @@ REST_AUTH = {
     'JWT_AUTH_HTTPONLY': True,
     'JWT_AUTH_SECURE': not DEBUG,  
     'JWT_AUTH_SAMESITE': 'Lax' if DEBUG else 'None',
-    "LOGIN_SERIALIZER": "apps.accounts.serializers.CustomLoginSerializer",
-    "USER_DETAILS_SERIALIZER": "apps.accounts.serializers.CustomUserDetailsSerializer",
+    'LOGIN_SERIALIZER': 'apps.accounts.serializers.CustomLoginSerializer',
+    'USER_DETAILS_SERIALIZER': 'apps.accounts.serializers.CustomUserDetailsSerializer',
+    'REGISTER_SERIALIZER': 'apps.accounts.serializers.CustomRegisterSerializer',
 }
 
 REST_USE_JWT = True
@@ -254,7 +256,8 @@ else:
     SESSION_COOKIE_SAMESITE = "None"
     CSRF_COOKIE_SAMESITE = "None"
 
-ACCOUNT_SIGNUP_FIELDS = ["email*", "username", "password1*", "password2*"]
+ACCOUNT_LOGIN_METHODS = ["email", "username"]
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
