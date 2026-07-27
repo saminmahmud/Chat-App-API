@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from .managers import CustomUserManager
+from django.conf import settings
 
 
 class CustomUser(AbstractUser):
@@ -43,4 +44,25 @@ class CustomUser(AbstractUser):
         return super().is_active and email_verified
         
             
+class FriendRequest(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        ACCEPTED = "accepted", "Accepted"
+        CANCELLED = "cancelled", "Cancelled"
+        
+    receiver = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='receiver_friend_requests', on_delete=models.CASCADE)
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='sender_friend_requests', on_delete=models.CASCADE)
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
+    def __str__(self):
+        return f"FriendRequest from {self.sender.username} to {self.receiver.username} - Status: {self.status}"
+    
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ('receiver', 'sender')
+        indexes = [
+            models.Index(fields=['receiver', 'sender']),
+        ]
+

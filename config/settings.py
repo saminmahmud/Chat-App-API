@@ -65,7 +65,6 @@ INSTALLED_APPS = [
     'apps.accounts',
     'apps.conversations',
     'apps.messaging',
-    'apps.stories',
     'apps.notifications',
 ]
 
