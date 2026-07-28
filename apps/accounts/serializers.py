@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, get_user_model
 from dj_rest_auth.serializers import LoginSerializer, UserDetailsSerializer
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from rest_framework import serializers
+from .models import FriendRequest
 
 User = get_user_model()
 
@@ -76,3 +77,53 @@ class CustomUserDetailsSerializer(UserDetailsSerializer):
         if "email" in attrs:
             raise serializers.ValidationError({"email": "You cannot update the email."})
         return super().validate(attrs)
+
+
+class UserMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "username", "profile_picture")    
+
+
+class FriendRequestSerializer(serializers.ModelSerializer):
+    sender = UserMiniSerializer(read_only=True)
+    receiver = UserMiniSerializer(read_only=True)
+    
+    class Meta:
+        model = FriendRequest
+        fields = ("id", "sender", "receiver", "status", "created_at", "updated_at")
+        read_only_fields = fields
+      
+        
+class FriendRequestCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FriendRequest
+        fields = ("receiver",)
+        
+    def validate_receiver(self, receiver):
+        request = self.context["request"]
+        
+        if receiver == request.user:
+            raise serializers.ValidationError("You cannot send a friend request to yourself.")
+        
+        existing_request = FriendRequest.objects.filter(sender=request.user, receiver=receiver).first()
+        
+        if (existing_request and existing_request.status != FriendRequest.Status.CANCELLED):
+            raise serializers.ValidationError("Friend request already sent.")
+        
+        return receiver
+    
+    def create(self, validated_data):
+        sender = validated_data["sender"]
+        receiver = validated_data["receiver"]
+        
+        friend_request = FriendRequest.objects.filter(sender=sender, receiver=receiver, status=FriendRequest.Status.CANCELLED).first()
+        
+        if friend_request:
+            friend_request.status = FriendRequest.Status.PENDING
+            friend_request.save(update_fields=["status"])
+            return friend_request
+            
+        return super().create(validated_data)
+    
+    

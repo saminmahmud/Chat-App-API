@@ -63,6 +63,7 @@ class FriendRequest(models.Model):
         ordering = ['-created_at']
         unique_together = ('receiver', 'sender')
         indexes = [
-            models.Index(fields=['receiver', 'sender']),
+            models.Index(fields=['receiver']),
+            models.Index(fields=['sender']),
         ]
 

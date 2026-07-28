@@ -24,7 +24,7 @@ class Conversation(models.Model):
             models.Index(fields=['name']),
         ]
         
-
+        
 class Participant(models.Model):
     class Role(models.TextChoices):
         MEMBER = "member", "Member"
