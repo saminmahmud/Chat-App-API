@@ -1,18 +1,16 @@
-from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
 from io import BytesIO
 from PIL import Image
 from django.core.files.uploadedfile import SimpleUploadedFile
+from tests.base import BaseTestCase
 
-User = get_user_model()
 
-
-class UserProfileAPITestCase(APITestCase):
+class UserProfileAPITestCase(BaseTestCase, APITestCase):
     def setUp(self):
         self.url = "/api/auth/user/"
 
-        self.user = User.objects.create_user(
+        self.user = self.create_user(
             email="test@example.com",
             password="Password123@",
             bio="Old Bio"

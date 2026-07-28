@@ -1,14 +1,13 @@
-from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
+from tests.base import BaseTestCase
 
-User = get_user_model()
 
-class LoginAPITestCase(APITestCase):
+class LoginAPITestCase(BaseTestCase, APITestCase):
     def setUp(self):
         self.url = "/api/auth/login/"
         
-        self.user = User.objects.create_user(
+        self.user = self.create_user(
             email="test@example.com",
             password="password123"
         )
