@@ -5,7 +5,8 @@ from .views import *
 
 router = DefaultRouter()
 
-router.register('friend-requests', FriendRequestViewSet, basename='friend-request')
+router.register('conversations', ConversationViewSet, basename='conversation')
+router.register('participants', ParticipantViewSet, basename='participant')
 
 urlpatterns = [
     path('', include(router.urls)),

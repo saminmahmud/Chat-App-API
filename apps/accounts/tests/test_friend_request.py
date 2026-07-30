@@ -1,11 +1,9 @@
 from rest_framework.test import APITestCase
-from django.contrib.auth import get_user_model
 from apps.accounts.models import FriendRequest
 from rest_framework import status
 from tests.base import BaseTestCase
 from django.urls import reverse
-
-User = get_user_model()
+from apps.conversations.models import Conversation
 
 
 class FriendRequestTestCase(BaseTestCase, APITestCase):
@@ -55,6 +53,15 @@ class FriendRequestTestCase(BaseTestCase, APITestCase):
         friend_request.refresh_from_db()
         
         self.assertEqual(friend_request.status, FriendRequest.Status.ACCEPTED)
+        
+        conversation_exists = Conversation.objects.filter(
+            participants__user=self.sender
+        ).exists() and Conversation.objects.filter(
+            participants__user=self.receiver 
+        ).exists()
+        
+        self.assertTrue(conversation_exists)
+            
         
     def test_cancel_friend_request(self):
         friend_request = FriendRequest.objects.create(

@@ -21,6 +21,7 @@ urlpatterns = [
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     
     path('api/', include('apps.accounts.urls')),
+    path('api/', include('apps.conversations.urls')),
 ]
 
 if settings.DEBUG:

@@ -4,12 +4,13 @@ from dj_rest_auth.views import LoginView
 from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets
 from apps.accounts.models import FriendRequest
-from apps.accounts.prmissions import IsEmailVerified
+from apps.accounts.permissions import IsEmailVerified
 from apps.accounts.serializers import LoginResponseSerializer, LoginUserSerializer
 from .serializers import FriendRequestSerializer, FriendRequestCreateSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from apps.conversations.models import Conversation, Participant
 
 
 class CustomLoginView(LoginView):
@@ -59,6 +60,21 @@ class FriendRequestViewSet(viewsets.ModelViewSet):
         
         friend_request.status = FriendRequest.Status.ACCEPTED
         friend_request.save(update_fields=["status"])
+        
+        conversation = Conversation.objects.create(
+            type=Conversation.Type.PRIVATE
+        )
+        
+        participant1 = Participant.objects.create(
+            user=friend_request.sender,
+            conversation=conversation
+        )
+        
+        participant2 = Participant.objects.create(
+            user=friend_request.receiver,
+            conversation=conversation
+        )
+        
         return Response(
             {"detail": "Friend request accepted."},
             status=status.HTTP_200_OK,

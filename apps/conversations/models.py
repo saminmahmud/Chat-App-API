@@ -10,7 +10,7 @@ class Conversation(models.Model):
     type = models.CharField(max_length=10, choices=Type.choices, default=Type.PRIVATE)
     name = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='conversation_images/', blank=True, null=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='created_conversations', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='created_conversations', on_delete=models.CASCADE, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
